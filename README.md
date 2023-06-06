@@ -17,9 +17,46 @@ MySQL 读写 adminUserToken 对象。
 
 1. login 写入 adminUserToken 对象
 
-GET localhost:8081/users/admin/login
+POST localhost:8081/users/admin/login
+
+发送：
+
+```json
+{
+    "userName": "newbee-admin1",
+    "passwordMd5": "e10adc3949ba59abbe56e057f20f883e"
+}
+```
+
+返回：
+
+```json
+{
+    "resultCode": 200,
+    "message": "SUCCESS",
+    "data": "eae09a7924c5e6a2b68e03695f4d9c71" //TOKEN串
+}
+```
 
 
 2. 读资源 读取 adminUserToken 对象
 
 POST localhost:8081/users/admin/profile, 携带 Header
+
+Header 为 {“token”: "上面响应得到的 TOKEN 串" }
+
+返回:
+
+```json
+{
+    "resultCode": 200,
+    "message": "SUCCESS",
+    "data": {
+        "adminUserId": 2,
+        "loginUserName": "newbee-admin1",
+        "loginPassword": "******",
+        "nickName": "用户01",
+        "locked": 0
+    }
+}
+```
