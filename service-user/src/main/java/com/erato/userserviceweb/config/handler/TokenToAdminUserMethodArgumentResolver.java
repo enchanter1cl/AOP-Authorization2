@@ -2,7 +2,6 @@ package com.erato.userserviceweb.config.handler;
 
 import com.erato.cloudcommon.exception.NewBeeMallException;
 import com.erato.userserviceweb.config.annotation.TokenToAdminUser;
-import com.erato.userserviceweb.dao.AdminUserTokenMapper;
 import com.erato.userserviceweb.entity.AdminUserToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
@@ -16,9 +15,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
 public class TokenToAdminUserMethodArgumentResolver implements HandlerMethodArgumentResolver {
-
-    @Autowired
-    AdminUserTokenMapper adminUserTokenMapper;
 
     @Autowired
     RedisTemplate redisTemplate;
