@@ -2,7 +2,6 @@ package com.erato.userserviceweb.service.impl;
 
 import com.erato.cloudcommon.util.SystemUtil;
 import com.erato.userserviceweb.dao.AdminUserMapper;
-import com.erato.userserviceweb.dao.AdminUserTokenMapper;
 import com.erato.userserviceweb.entity.AdminUser;
 import com.erato.userserviceweb.entity.AdminUserToken;
 import com.erato.userserviceweb.service.AdminUserService;
@@ -11,10 +10,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * (AdminUser)表服务实现类
@@ -30,9 +30,6 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Resource
     private AdminUserMapper adminUserMapper;
 
-    @Resource
-    private AdminUserTokenMapper newBeeAdminUserTokenMapper;
-
     public String login(String userName, String password) {
 
         // 读库 读出 adminUser
@@ -40,34 +37,18 @@ public class AdminUserServiceImpl implements AdminUserService {
         if (loginAdminUser != null) {
             //登录后即执行修改token的操作
             String token = getNewToken(System.currentTimeMillis() + "", loginAdminUser.getAdminUserId());
-              //根据userId 查到 adminUserToken
-            AdminUserToken adminUserToken = newBeeAdminUserTokenMapper.queryById(loginAdminUser.getAdminUserId());
-            //当前时间
-            Date now = new Date();
-            //过期时间
-            Date expireTime = new Date(now.getTime() + 2 * 24 * 3600 * 1000);//过期时间 48 小时
-            if (adminUserToken == null) { //无则新增
-                adminUserToken = new AdminUserToken();
-                adminUserToken.setAdminUserId(loginAdminUser.getAdminUserId());
-                adminUserToken.setToken(token);
-                adminUserToken.setUpdateTime(now);
-                adminUserToken.setExpireTime(expireTime);
-                //新增一条token数据
-                if (newBeeAdminUserTokenMapper.insert(adminUserToken) > 0) {
-                    //新增成功后返回
-                    return token;
-                }
-            } else { //有则更新
-                adminUserToken.setToken(token);
-                adminUserToken.setUpdateTime(now);
-                adminUserToken.setExpireTime(expireTime);
-                //更新
-                if (newBeeAdminUserTokenMapper.update(adminUserToken) > 0) {
-                    //修改成功后返回
-                    return token;
-                }
-            }
 
+            //不需要判断库里存不存在该 adminUserToken（mysql 无则新增 有则更新）, 也不需要插入 updateTime, expireTime 字段
+            AdminUserToken adminUserToken = new AdminUserToken();
+            adminUserToken.setAdminUserId(loginAdminUser.getAdminUserId());
+            adminUserToken.setToken(token);
+
+            // 写入redis库
+            ValueOperations<String, AdminUserToken> ops = redisTemplate.opsForValue();
+            ops.set(token, adminUserToken, 48, TimeUnit.HOURS);
+
+            //新增成功后返回
+            return token;
         }
         return "登录失败";
     }
