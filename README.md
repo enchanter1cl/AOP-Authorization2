@@ -41,7 +41,11 @@ AdminUserWebMvcConfigurer 源码见 com.erato.usersvc.config.AdminUserWebConfigu
 
 ### v1.2
 
-MySQL 读写 adminUserToken 对象。建库建表 sql 见 `/sql`
+MySQL 读写 adminUserToken 对象。建库建表 sql 见 `/sql`。
+
+### v1.2.1
+
+Redis 读写 adminUserToken 对象。
 
 
 ## 使用测试:
