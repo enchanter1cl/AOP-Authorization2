@@ -9,7 +9,7 @@
 
 ### v1.2
 
-MySQL 读写 adminUserToken 对象。
+MySQL 读写 adminUserToken 对象。建库建表 sql 见 `/sql`
 
 
 ## 使用测试:
