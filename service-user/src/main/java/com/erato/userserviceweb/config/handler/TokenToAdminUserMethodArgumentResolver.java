@@ -1,8 +1,8 @@
 package com.erato.userserviceweb.config.handler;
 
 import com.erato.cloudcommon.exception.NewBeeMallException;
+import com.erato.cloudcommon.pojo.AdminUserToken;
 import com.erato.userserviceweb.config.annotation.TokenToAdminUser;
-import com.erato.userserviceweb.entity.AdminUserToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.redis.core.RedisTemplate;

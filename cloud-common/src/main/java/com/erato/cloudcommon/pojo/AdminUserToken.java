@@ -1,10 +1,10 @@
-package com.erato.userserviceweb.entity;
+package com.erato.cloudcommon.pojo;
 
 import lombok.Data;
 import lombok.ToString;
 
-import java.util.Date;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * (AdminUserToken)实体类

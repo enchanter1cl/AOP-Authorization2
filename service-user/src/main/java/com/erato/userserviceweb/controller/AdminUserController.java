@@ -2,9 +2,9 @@ package com.erato.userserviceweb.controller;
 
 import com.erato.cloudcommon.dto.Result;
 import com.erato.cloudcommon.dto.ResultGenerator;
+import com.erato.cloudcommon.pojo.AdminUserToken;
 import com.erato.userserviceweb.config.annotation.TokenToAdminUser;
 import com.erato.userserviceweb.entity.AdminUser;
-import com.erato.userserviceweb.entity.AdminUserToken;
 import com.erato.userserviceweb.req.AdminLoginParam;
 import com.erato.userserviceweb.service.AdminUserService;
 import lombok.extern.slf4j.Slf4j;

@@ -1,9 +1,9 @@
 package com.erato.userserviceweb.service.impl;
 
+import com.erato.cloudcommon.pojo.AdminUserToken;
 import com.erato.cloudcommon.util.SystemUtil;
 import com.erato.userserviceweb.dao.AdminUserMapper;
 import com.erato.userserviceweb.entity.AdminUser;
-import com.erato.userserviceweb.entity.AdminUserToken;
 import com.erato.userserviceweb.service.AdminUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
