@@ -9,10 +9,7 @@ import com.erato.userserviceweb.req.AdminLoginParam;
 import com.erato.userserviceweb.service.AdminUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -58,6 +55,11 @@ public class AdminUserController {
             return result;
         }
         return ResultGenerator.genFailResult("无此用户数据");
+    }
+
+    @GetMapping("/users/admin/test")
+    public String testGateway () {
+        return "hello";
     }
 
 

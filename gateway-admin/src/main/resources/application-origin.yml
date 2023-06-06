@@ -20,7 +20,7 @@ spring:
           lower-case-service-id: true
       routes:
         - id: user-service-route
-          uri: lb://user-service-web
+          uri: lb://user-service
           order: 1
           predicates:
             - Path=/users/admin/**
