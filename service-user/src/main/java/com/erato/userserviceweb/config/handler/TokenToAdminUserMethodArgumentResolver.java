@@ -6,6 +6,8 @@ import com.erato.userserviceweb.dao.AdminUserTokenMapper;
 import com.erato.userserviceweb.entity.AdminUserToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -17,6 +19,9 @@ public class TokenToAdminUserMethodArgumentResolver implements HandlerMethodArgu
 
     @Autowired
     AdminUserTokenMapper adminUserTokenMapper;
+
+    @Autowired
+    RedisTemplate redisTemplate;
 
     public TokenToAdminUserMethodArgumentResolver() {}
 
@@ -36,15 +41,13 @@ public class TokenToAdminUserMethodArgumentResolver implements HandlerMethodArgu
             String token = webRequest.getHeader("token");
 
             if (null != token && !"".equals(token)) {
-                AdminUserToken adminUserToken = adminUserTokenMapper.selectByToken(token);
+                ValueOperations<String, AdminUserToken> ops = redisTemplate.opsForValue();
+                AdminUserToken adminUserToken = ops.get(token);
 
                 if (adminUserToken == null) {
                     NewBeeMallException.fail("数据库取出 adminUserToken 为null");
                 }
-                else if (adminUserToken.getExpireTime().getTime() <= System.currentTimeMillis()) {
-                    NewBeeMallException.fail("数据库取出 adminUserToken 的过期时间字段早于今天");
-                }
-                //数据库取出的adminUserToken不空 ~~也不过期~~ ，终于可以返回
+                //数据库用 token 为 key 能取到东西， 即可返回
                 return adminUserToken;
 
             } else {
