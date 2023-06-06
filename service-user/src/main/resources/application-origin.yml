@@ -9,10 +9,10 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   redis:
-    database: 0
-    host: localhost
-    port: 6379
-    password: notsosucure
+    database: 13
+    host: 121.37.71.228
+    port: 6380
+    password: foobared
     # 连接超时时间（毫秒）
     timeout: 5000
     jedis:

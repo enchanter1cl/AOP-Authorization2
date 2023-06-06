@@ -6,7 +6,6 @@ import com.erato.userserviceweb.dao.AdminUserTokenMapper;
 import com.erato.userserviceweb.entity.AdminUserToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -18,9 +17,6 @@ public class TokenToAdminUserMethodArgumentResolver implements HandlerMethodArgu
 
     @Autowired
     AdminUserTokenMapper adminUserTokenMapper;
-
-    @Autowired
-    RedisTemplate redisTemplate;
 
     public TokenToAdminUserMethodArgumentResolver() {}
 
