@@ -1,3 +1,109 @@
+--- English ---
+
+# AOP Approach for Handling Token Processing and Authentication
+
+## Overview
+
+In general, the backend handles tokens with the following steps:
+
+1. Generate the token.  
+2. Retrieve the token value from the frontend request.  
+3. Validate the token value — check whether it exists, whether it is expired, etc.  
+
+After implementing the login feature, the user’s login status needs to be verified. Here, login status maintenance means *“whether the token value exists and whether the token value is valid.”* The validation of the token value is implemented by backend code. Since most APIs require login validation, adding user data query statements in each method would be redundant. Therefore, method extraction was performed, and user information is returned via an annotation aspect approach.  
+
+For administrator user authentication, a custom annotation `@TokenToAdminUser` was defined. Then, a custom method argument resolver was implemented. By adding the `@TokenToAdminUser` annotation to methods requiring user identity information, the method argument resolver can obtain the currently logged-in user object.  
+
+- `TokenToAdminUser` source code: `com.erato.usersvc.config.annotation.TokenToAdminUser`  
+- Argument resolver `TokenToAdminUserMethodArgumentResolver` source code: `com.erato.usersvc.config.handler.TokenToAdminUserMethodArgumentResolver`  
+
+Execution logic:  
+
+1. Retrieve the token value from the request header. If it does not exist, return an error message to the frontend; if it exists, continue the process.  
+2. Use the token value to query the `AdminUserToken` object — check if it exists or has expired. If not found or expired, return an error message to the frontend; if valid, continue the process.  
+3. Finally, configure `TokenToAdminUserMethodArgumentResolver` in `WebMvcConfigurer` to activate it.  
+
+- `AdminUserWebMvcConfigurer` source code: `com.erato.usersvc.config.AdminUserWebConfigurer`  
+
+With this setup, you only need to add the `@TokenToAdminUser` annotation to API interfaces requiring user authentication, and then proceed with the respective business logic.  
+
+## Architecture
+
+### v1.2 (Note: the initial version of this repository is called v1.2)
+
+Monolithic architecture.  
+
+### v1.3  
+
+Refactored into a microservices architecture with the introduction of a gateway layer. Identity authentication operations are performed in advance at the gateway layer.  
+
+The service gateway component acts as a bridge between the client and the internal microservices architecture. It provides a unified entry point for requests while also enabling customized preprocessing. In this context, unified authentication is performed at the gateway layer to prevent requests without proper identity tokens from directly reaching the microservices. If the request header contains a valid identity token, the request is allowed to pass through to the microservices; otherwise, the gateway immediately responds with an error message.  
+
+From an implementation perspective, this involves the concept of gateway filters. In this project, **Spring Cloud Gateway’s global filter** is used to implement the authentication feature.  
+
+- Global filter `ValidTokenGlobalFilter` source code: `com.erato.gatewayadmin.filter.ValidTokenGlobalFilter`  
+
+## Data Storage
+
+### v1.2  
+
+MySQL for reading and writing `adminUserToken` objects. Database schema and table creation SQL can be found in `/sql`.  
+
+### v1.2.1  
+
+Redis for reading and writing `adminUserToken` objects.  
+
+## Usage Testing
+
+1. **Login** – write `adminUserToken` object  
+
+   **Request**  
+   ```
+   POST localhost:8081/users/admin/login
+   ```
+   **Payload**  
+   ```json
+   {
+       "userName": "newbee-admin1",
+       "passwordMd5": "e10adc3949ba59abbe56e057f20f883e"
+   }
+   ```
+   **Response**  
+   ```json
+   {
+       "resultCode": 200,
+       "message": "SUCCESS",
+       "data": "eae09a7924c5e6a2b68e03695f4d9c71" // TOKEN string
+   }
+   ```
+
+2. **Read resource** – read `adminUserToken` object  
+
+   **Request**  
+   ```
+   POST localhost:8081/users/admin/profile
+   ```
+   **Header**  
+   ```
+   { "token": "<TOKEN string returned from the previous response>" }
+   ```
+   **Response**  
+   ```json
+   {
+       "resultCode": 200,
+       "message": "SUCCESS",
+       "data": {
+           "adminUserId": 2,
+           "loginUserName": "newbee-admin1",
+           "loginPassword": "******",
+           "nickName": "User01",
+           "locked": 0
+       }
+   }
+   ```
+
+--- 中文 ---
+
 # AOP 形式 解决 Token 处理及鉴权
 
 ## 概述
